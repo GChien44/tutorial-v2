@@ -39,6 +39,7 @@ class ThumbnailReference(ndb.Model):
   thumbnail_key = ndb.StringProperty()
   date = ndb.DateTimeProperty(auto_now_add=True)
   labels = ndb.StringProperty(repeated=True)
+  original_photo = ndb.StringProperty()
 
 # A given label has a list of thumbnail_references with the label.
 class Label(ndb.Model):
@@ -123,10 +124,10 @@ class ReceiveMessage(webapp2.RequestHandler):
     if event_type == 'OBJECT_FINALIZE':
       thumbnail = create_thumbnail(self, photo_name)
       store_thumbnail_in_gcs(self, thumbnail_key, thumbnail)
-
+      original_photo = get_original(photo_name, generation_number)
       uri = 'gs://' + PHOTO_BUCKET + '/' + photo_name
       labels = get_labels(uri)
-      thumbnail_reference = ThumbnailReference(thumbnail_name=photo_name, thumbnail_key=thumbnail_key, labels=labels)
+      thumbnail_reference = ThumbnailReference(thumbnail_name=photo_name, thumbnail_key=thumbnail_key, labels=labels, original_photo=original_photo)
       thumbnail_reference.put()
 
       add_thumbnail_reference_to_labels(labels, thumbnail_key)
@@ -167,6 +168,9 @@ def get_thumbnail(photo_name):
   filename = '/gs/' + THUMBNAIL_BUCKET + '/' + photo_name
   blob_key = blobstore.create_gs_key(filename)
   return images.get_serving_url(blob_key)
+
+def get_original(photo_name, generation):
+  return 'https://storage.googleapis.com/' + PHOTO_BUCKET + '/' + photo_name + '?generation=' + generation
 
 def create_thumbnail(self, photo_name):
   filename = '/gs/' + PHOTO_BUCKET + '/' + photo_name
