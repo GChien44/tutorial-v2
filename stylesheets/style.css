@@ -1,0 +1,41 @@
+body {
+  background-color: lavender;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 10%;
+  background-color: purple;
+  position: fixed;
+}
+
+li a {
+  display: block;
+  color: white;
+  padding: 8px 8px;
+  text-align: center;
+  border-bottom: 1px solid white;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+li a:hover {
+  background-color: violet;
+  color: white;
+}
+
+h1 {
+  color: violet;
+  text-align: center;
+  font-size: 50px;
+  border-bottom: 3px solid purple;
+  padding: 15px;
+  width: 60%;
+  margin: auto;
+  margin-bottom: 30px;
+}
+
