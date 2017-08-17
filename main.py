@@ -136,8 +136,8 @@ class ReceiveMessage(webapp2.RequestHandler):
     # If delete/archive message: delete thumbnail from gcs bucket and delete
     # thumbnail reference from datastore.
     elif event_type == 'OBJECT_DELETE' or event_type == 'OBJECT_ARCHIVE':
-      delete_thumbnail(thumbnail_key)
       remove_thumbnail_from_labels(thumbnail_key)
+      delete_thumbnail(thumbnail_key)
 
     # No action performed if event_type is OBJECT_UPDATE
 
@@ -244,10 +244,9 @@ def remove_thumbnail_from_labels(thumbnail_key):
   labels_to_delete_from = thumbnail_reference.labels
   for label_name in labels_to_delete_from:
     label = Label.query(Label.label_name==label_name).get()
-    labeled_thumbnails = label.labeled_thumbnails
-    labeled_thumbnails.remove(thumbnail_reference)
+    label.labeled_thumbnails.remove(thumbnail_key)
     # If there are no more thumbnails with a given label, delete the label.
-    if not labeled_thumbnails:
+    if not label.labeled_thumbnails:
       label.key.delete()
     else:
       label.put()
