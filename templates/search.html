@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Search</title>
+  </head>
+
+  <body>
+
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/photos">Photos</a></li>
+      <li><a href="/search">Search</a></li>
+    </ul>
+
+    <h1>Search</h1>
+
+    <form class="search" action="/search" method="get">
+      <div class="search-term-container"><input class="search-term" name="search-term" placeholder="Search">
+      <div class="search-button-container"><button class="search-button">Search</button></div>
+    </form>
+
+    <br>
+
+    {% for img_url, thumbnail_reference in thumbnails.iteritems() %}
+    <div class="thumbnail">
+      <p>{{thumbnail_reference.thumbnail_name}}</p>
+      <img src='{{img_url}}'>
+      <p><small>{{thumbnail_reference.date.strftime('%B %d %Y %I:%M')}} UTC</small></p>
+    </div>
+    {% endfor %}
+
+  </body>
+</html>
