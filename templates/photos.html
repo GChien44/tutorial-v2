@@ -4,104 +4,6 @@
   <head>
     <title>Photos</title>
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
-  <style>
-    div.gallery {
-      margin-left: 12%;
-      margin-right: 10%;
-    }
-
-    div.thumbnail {
-      margin: 5px;
-      float: left;
-      width: 180px;
-      height: 240px;
-      border: 1px solid lavender;
-    }
-
-    div.thumbnail img:hover {
-      opacity: 0.7;
-      cursor: pointer;
-    }
-
-    div.thumbnail img {
-      display: block;
-      margin: auto;
-    }
-
-    div.descent {
-      padding: 10px;
-      text-align: center;
-    }
-
-    div.modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      padding-top: 100px;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgb(0,0,0);
-      background-color: rgba(0,0,0,0.75);
-    }
-
-    div.modal img {
-      display: block;
-      margin: auto;
-      width: 60%;
-      max-width: 700px;
-      height: auto;
-      -webkit-animation-name: zoom;
-      -webkit-animation-duration: 0.6s;
-      animation-name: zoom;
-      animation-duration: 0.6s;
-    }
-
-    #caption {
-      margin: auto;
-      display: block;
-      width: 80%;
-      max-width: 700px;
-      text-align: center;
-      color: #ccc;
-      padding: 10px 0;
-      height: 150px;
-      -webkit-animation-name: zoom;
-      -webkit-animation-duration: 0.6s;
-      animation-name: zoom;
-      animation-duration: 0.6s;
-    }
-
-    @-webkit-keyframes zoom {
-      from {-webkit-transform:scale(0)}
-      to {-webkit-transform:scale(1)}
-    }
-
-    @keyframes zoom {
-      from {transform:scale(0)}
-      to {transform:scale(1)}
-    }
-
-    span.close {
-      position: absolute;
-      top: 15px;
-      right: 35px;
-      color: #f1f1f1;
-      font-size: 40px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-
-    span.close:hover,
-    span.close:focus {
-      color: #bbb;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-  </style>
   </head>
 
   <body>
@@ -109,6 +11,7 @@
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/photos">Photos</a></li>
+      <li><a href="/search">Search</a></li>
     </ul>
 
     <h1>Photos</h1>
@@ -120,9 +23,7 @@
     <div class="gallery">
       {% for img_url, thumbnail_reference in thumbnails.iteritems() %}
       <div class="thumbnail">
-        <!--<a href='#{{thumbnail_reference.thumbnail_key}}'>-->
-          <img id='{{thumbnail_reference.thumbnail_name}}' src='{{img_url}}' alt='{{thumbnail_reference.thumbnail_name}}'>
-          <!--</a>-->
+        <img id='{{thumbnail_reference.thumbnail_name}}' src='{{img_url}}' alt='{{thumbnail_reference.thumbnail_name}}'>
         <div class="descent">{{thumbnail_reference.thumbnail_name}}</div>
       </div>
 

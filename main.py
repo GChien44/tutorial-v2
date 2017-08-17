@@ -18,8 +18,8 @@ from google.appengine.api import images
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_environment = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
 
-THUMBNAIL_BUCKET = 'photo-thumbnails-bucket'
-PHOTO_BUCKET = 'photo-album-bucket'
+THUMBNAIL_BUCKET = 'thumbnails-bucket'
+PHOTO_BUCKET = 'shared-photo-album'
 NUM_NOTIFICATIONS_TO_DISPLAY = 10
 MAX_LABELS = 5
 
@@ -81,6 +81,7 @@ class SearchHandler(webapp2.RequestHandler):
       for thumbnail_key in thumbnail_keys:
         img_url = get_thumbnail(thumbnail_key)
         thumbnails[img_url] = ThumbnailReference.query(ThumbnailReference.thumbnail_key==thumbnail_key).get()
+    thumbnails = collections.OrderedDict(reversed(list(thumbnails.items())))
     template_values = {'thumbnails':thumbnails}
     template = jinja_environment.get_template("search.html")
     self.response.write(template.render(template_values))
@@ -169,6 +170,7 @@ def get_thumbnail(photo_name):
   blob_key = blobstore.create_gs_key(filename)
   return images.get_serving_url(blob_key)
 
+# Retrive url of original photos
 def get_original(photo_name, generation):
   return 'https://storage.googleapis.com/' + PHOTO_BUCKET + '/' + photo_name + '?generation=' + generation
 

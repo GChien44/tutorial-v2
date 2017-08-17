@@ -3,6 +3,7 @@
 
   <head>
     <title>Search</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
   </head>
 
   <body>
@@ -16,21 +17,46 @@
     <h1>Search</h1>
 
     <form class="search" action="/search" method="get">
-      <div class="search-term-container"><input class="search-term" name="search-term" placeholder="Search">
-      <div class="search-button-container"><button class="search-button">Search</button></div>
+      <input class="search-term" name="search-term" placeholder="Search">
+      <button class="search-button">Search</button>
     </form>
 
     <br>
 
-    {% for img_url, thumbnail_reference in thumbnails.iteritems() %}
+    <div class="gallery">
+      {% for img_url, thumbnail_reference in thumbnails.iteritems() %}
       <div class="thumbnail">
-        <p>{{thumbnail_reference.thumbnail_name}}</p>
-        <img src='{{img_url}}'>
-        <p><small>{{thumbnail_reference.date.strftime('%B %d %Y %I:%M')}} UTC</small></p>
+        <img id='{{thumbnail_reference.thumbnail_name}}' src='{{img_url}}' alt='{{thumbnail_reference.thumbnail_name}}'>
+        <div class="descent">{{thumbnail_reference.thumbnail_name}}</div>
       </div>
-    {% else %}
+
+      <div id="myModal" class="modal">
+        <span class="close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
+        <img id='img01'>
+        <div id="caption"></div>
+      </div>
+
+      <script>
+        var modal = document.getElementById('myModal');
+        var img = document.getElementById('{{thumbnail_reference.thumbnail_name}}');
+        var modalImg = document.getElementById('img01');
+        var captionText = document.getElementById("caption");
+        img.onclick = function(){
+          modal.style.display = "block";
+          modalImg.src = '{{thumbnail_reference.original_photo}}';
+          captionText.innerHTML = this.alt;
+        }
+
+        var span = document.getElementsByClassName("close")[0];
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+      </script>
+
+      {% else %}
       <h2>No Search Results</h2>
-    {% endfor %}
+      {% endfor %}
+    </div>
 
   </body>
 </html>
