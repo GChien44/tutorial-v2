@@ -218,9 +218,15 @@ def get_labels(uri):
   response = service_request.execute()
   labels_full = response['responses'][0].get('labelAnnotations')
 
+  ignore = ['of', 'like', 'the', 'and', 'a', 'an']
+
   if labels_full is not None:
     for label in labels_full:
       labels.append(label['description'])
+      descriptors = label['description'].split()
+      for descript in descriptors:
+        if descript not in labels and descript not in ignore:
+            labels.append(descript)
 
   return labels
 
@@ -234,7 +240,7 @@ def add_thumbnail_reference_to_labels(labels, thumbnail_key):
       thumbnail_list_for_new_label.append(thumbnail_key)
       new_label = Label(label_name=label, labeled_thumbnails=thumbnail_list_for_new_label)
       new_label.put()
-    else:
+    elif thumbnail_key not in label_to_append_to.labeled_thumbnails:
       label_to_append_to.labeled_thumbnails.append(thumbnail_key)
       label_to_append_to.put()
 
@@ -244,12 +250,14 @@ def remove_thumbnail_from_labels(thumbnail_key):
   labels_to_delete_from = thumbnail_reference.labels
   for label_name in labels_to_delete_from:
     label = Label.query(Label.label_name==label_name).get()
-    label.labeled_thumbnails.remove(thumbnail_key)
-    # If there are no more thumbnails with a given label, delete the label.
-    if not label.labeled_thumbnails:
-      label.key.delete()
-    else:
-      label.put()
+    if label:
+      if thumbnail_key in label.labeled_thumbnails:
+        label.labeled_thumbnails.remove(thumbnail_key)
+      # If there are no more thumbnails with a given label, delete the label.
+      if not label.labeled_thumbnails:
+        label.key.delete()
+      else:
+        label.put()
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
