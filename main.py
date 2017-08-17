@@ -80,7 +80,6 @@ class SearchHandler(webapp2.RequestHandler):
       for thumbnail_key in thumbnail_keys:
         img_url = get_thumbnail(thumbnail_key)
         thumbnails[img_url] = ThumbnailReference.query(ThumbnailReference.thumbnail_key==thumbnail_key).get()
-    # Do something here to indicate there are no search results
     template_values = {'thumbnails':thumbnails}
     template = jinja_environment.get_template("search.html")
     self.response.write(template.render(template_values))
@@ -121,45 +120,22 @@ class ReceiveMessage(webapp2.RequestHandler):
     # If create message: get photo from photos gcs bucket, shrink to thumbnail,
     # and store thumbnail in thumbnails gcs bucket. Store thumbnail reference in
     # datastore.
-    uri = 'gs://' + PHOTO_BUCKET + '/' + photo_name
     if event_type == 'OBJECT_FINALIZE':
       thumbnail = create_thumbnail(self, photo_name)
       store_thumbnail_in_gcs(self, thumbnail_key, thumbnail)
 
+      uri = 'gs://' + PHOTO_BUCKET + '/' + photo_name
       labels = get_labels(uri)
       thumbnail_reference = ThumbnailReference(thumbnail_name=photo_name, thumbnail_key=thumbnail_key, labels=labels)
       thumbnail_reference.put()
 
-      # Add thumbnail_reference to appropriate labels or create new labels if
-      # necessary.
-      for label in labels:
-        label_to_append_to = Label.query(Label.label_name==label).get()
-        if label_to_append_to is None:
-          thumbnail_list_for_new_label = []
-          thumbnail_list_for_new_label.append(thumbnail_key)
-          new_label = Label(label_name=label, labeled_thumbnails=thumbnail_list_for_new_label)
-          new_label.put()
-        else:
-          label_to_append_to.labeled_thumbnails.append(thumbnail_key)
-          label_to_append_to.put()
+      add_thumbnail_reference_to_labels(labels, thumbnail_key)
 
     # If delete/archive message: delete thumbnail from gcs bucket and delete
     # thumbnail reference from datastore.
     elif event_type == 'OBJECT_DELETE' or event_type == 'OBJECT_ARCHIVE':
       delete_thumbnail(thumbnail_key)
-
-      # Remove the thumbnail_reference from all labels lists.
-      thumbnail_reference = ThumbnailReference.query(ThumbnailReference.thumbnail_key==thumbnail_key).get()
-      labels_to_delete_from = thumbnail_reference.labels
-      for label_name in labels_to_delete_from:
-        label = Label.query(Label.label_name==label_name).get()
-        labeled_thumbnails = label.labeled_thumbnails
-        labeled_thumbnails.remove(thumbnail_reference)
-        # If there are no more thumbnails with a given label, delete the label.
-        if not labeled_thumbnails:
-          label.key.delete()
-        else:
-          label.put()
+      remove_thumbnail_from_labels(thumbnail_key)
 
     # No action performed if event_type is OBJECT_UPDATE
 
@@ -234,12 +210,41 @@ def get_labels(uri):
       }]
   })
   response = service_request.execute()
-  labels_full = response['responses'][0]['labelAnnotations']
+  labels_full = response['responses'][0].get('labelAnnotations')
 
-  for label in labels_full:
-    labels.append(label['description'])
+  if labels_full is not None:
+    for label in labels_full:
+      labels.append(label['description'])
 
   return labels
+
+# Add thumbnail_reference to appropriate labels or create new labels if
+# necessary.
+def add_thumbnail_reference_to_labels(labels, thumbnail_key):
+  for label in labels:
+    label_to_append_to = Label.query(Label.label_name==label).get()
+    if label_to_append_to is None:
+      thumbnail_list_for_new_label = []
+      thumbnail_list_for_new_label.append(thumbnail_key)
+      new_label = Label(label_name=label, labeled_thumbnails=thumbnail_list_for_new_label)
+      new_label.put()
+    else:
+      label_to_append_to.labeled_thumbnails.append(thumbnail_key)
+      label_to_append_to.put()
+
+# Removes the thumbnail_reference from all labels lists.
+def remove_thumbnail_from_labels(thumbnail_key):
+  thumbnail_reference = ThumbnailReference.query(ThumbnailReference.thumbnail_key==thumbnail_key).get()
+  labels_to_delete_from = thumbnail_reference.labels
+  for label_name in labels_to_delete_from:
+    label = Label.query(Label.label_name==label_name).get()
+    labeled_thumbnails = label.labeled_thumbnails
+    labeled_thumbnails.remove(thumbnail_reference)
+    # If there are no more thumbnails with a given label, delete the label.
+    if not labeled_thumbnails:
+      label.key.delete()
+    else:
+      label.put()
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),

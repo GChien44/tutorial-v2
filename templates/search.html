@@ -23,11 +23,13 @@
     <br>
 
     {% for img_url, thumbnail_reference in thumbnails.iteritems() %}
-    <div class="thumbnail">
-      <p>{{thumbnail_reference.thumbnail_name}}</p>
-      <img src='{{img_url}}'>
-      <p><small>{{thumbnail_reference.date.strftime('%B %d %Y %I:%M')}} UTC</small></p>
-    </div>
+      <div class="thumbnail">
+        <p>{{thumbnail_reference.thumbnail_name}}</p>
+        <img src='{{img_url}}'>
+        <p><small>{{thumbnail_reference.date.strftime('%B %d %Y %I:%M')}} UTC</small></p>
+      </div>
+    {% else %}
+      <h2>No Search Results</h2>
     {% endfor %}
 
   </body>
