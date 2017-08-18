@@ -18,8 +18,8 @@ from google.appengine.api import images
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_environment = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
 
-THUMBNAIL_BUCKET = 'photo-thumbnails-bucket'
-PHOTO_BUCKET = 'photo-album-bucket'
+THUMBNAIL_BUCKET = 'thumbnails-bucket'
+PHOTO_BUCKET = 'shared-photo-album'
 NUM_NOTIFICATIONS_TO_DISPLAY = 10
 MAX_LABELS = 5
 
@@ -222,11 +222,12 @@ def get_labels(uri):
 
   if labels_full is not None:
     for label in labels_full:
-      labels.append(label['description'])
-      descriptors = label['description'].split()
-      for descript in descriptors:
-        if descript not in labels and descript not in ignore:
-          labels.append(descript)
+      if label['description'] not in labels:
+        labels.append(label['description'])
+        descriptors = label['description'].split()
+        for descript in descriptors:
+          if descript not in labels and descript not in ignore:
+            labels.append(descript)
 
   return labels
 
