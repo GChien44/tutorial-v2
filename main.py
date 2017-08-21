@@ -150,6 +150,8 @@ class ReceiveMessage(webapp2.RequestHandler):
       original_photo = get_original(photo_name, generation_number)
       uri = 'gs://' + PHOTO_BUCKET + '/' + photo_name
       labels = get_labels(uri, photo_name)
+      labels.append(photo_name)
+      labels.append(photo_name[:index])
       thumbnail_reference = ThumbnailReference(thumbnail_name=photo_name, thumbnail_key=thumbnail_key, labels=labels, original_photo=original_photo)
       thumbnail_reference.put()
 
@@ -248,7 +250,7 @@ def get_labels(uri, photo_name):
   response = service_request.execute()
   labels_full = response['responses'][0].get('labelAnnotations')
 
-  ignore = ['of', 'like', 'the', 'and', 'a', 'an']
+  ignore = ['of', 'like', 'the', 'and', 'a', 'an', 'with']
 
   # Add labels to the labels list if they are not already in the list and are
   # not in the ignore list.
