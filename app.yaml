@@ -9,9 +9,6 @@ handlers:
   script: main.app
   login: admin
 
-- url: /images
-  static_dir: images
-
 - url: /stylesheets
   static_dir: stylesheets
 
