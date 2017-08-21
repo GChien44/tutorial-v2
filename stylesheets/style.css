@@ -2,6 +2,7 @@ body {
   background-color: lavender;
 }
 
+/* Links sidebar */
 ul {
   list-style-type: none;
   margin: 0;
@@ -11,6 +12,7 @@ ul {
   position: fixed;
 }
 
+/* Links to other pages */
 li a {
   display: block;
   color: white;
@@ -19,15 +21,18 @@ li a {
   border-bottom: 1px solid white;
 }
 
+/* No division between last link and bottom of sidebar */
 li:last-child {
   border-bottom: none;
 }
 
+/* Change color of links when hovered over */
 li a:hover {
   background-color: violet;
   color: white;
 }
 
+/* Title of page */
 h1 {
   color: violet;
   text-align: center;
@@ -39,17 +44,20 @@ h1 {
   margin-bottom: 30px;
 }
 
+/* No search results styling on Search page */
 h2 {
   color: violet;
   text-align: center;
   font-size: 20px;
 }
 
+/* Keeps thumbnails from being too far to the left or right on page */
 div.gallery {
   margin-left: 12%;
   margin-right: 10%;
 }
 
+/* Box for thumbnail image and caption */
 div.thumbnail {
   margin: 5px;
   float: left;
@@ -58,27 +66,32 @@ div.thumbnail {
   border: 1px solid lavender;
 }
 
+/* Format thumbnails in a table */
 div.thumbnail:after {
   content: "";
   display: table;
   clear: both;
 }
 
+/* Add effects when thumbnail image is hovered over */
 div.thumbnail img:hover {
   opacity: 0.7;
   cursor: pointer;
 }
 
+/* Center image in thumbnail box */
 div.thumbnail img {
   display: block;
   margin: auto;
 }
 
+/* Center caption below thumbnail image */
 div.descent {
   padding: 10px;
   text-align: center;
 }
 
+/* Format pop-up that appears when a thumbnail is clicked */
 div.modal {
   display: none;
   position: fixed;
@@ -93,6 +106,7 @@ div.modal {
   background-color: rgba(0,0,0,0.8);
 }
 
+/* Position the box to hold photo scrolling */
 div.modal-content {
   position: relative;
   margin: auto;
@@ -101,18 +115,16 @@ div.modal-content {
   max-width: 1200px;
 }
 
+/* Format size and position of larger image */
 div.mySlides img {
   display: block;
   margin: auto;
   width: 100%;
   max-width: 700px;
   height: auto;
-  /*-webkit-animation-name: zoom;
-  -webkit-animation-duration: 0.6s;
-  animation-name: zoom;
-  animation-duration: 0.6s;*/
 }
 
+/* Format caption for larger image */
 #caption {
   margin: auto;
   display: block;
@@ -121,22 +133,9 @@ div.mySlides img {
   text-align: center;
   padding: 10px 0;
   height: 50px;
-  -webkit-animation-name: zoom;
-  -webkit-animation-duration: 0.6s;
-  animation-name: zoom;
-  animation-duration: 0.6s;
 }
 
-@-webkit-keyframes zoom {
-  from {-webkit-transform:scale(0)}
-  to {-webkit-transform:scale(1)}
-}
-
-@keyframes zoom {
-  from {transform:scale(0)}
-  to {transform:scale(1)}
-}
-
+/* Place 'x' to close pop-up when done scrolling through photos */
 span.close {
   position: absolute;
   top: 15px;
@@ -147,6 +146,7 @@ span.close {
   transition: 0.3s;
 }
 
+/* Change color of 'x' and pointer when 'x' is hovered over */
 span.close:hover,
 span.close:focus {
   color: #bbb;
@@ -154,10 +154,12 @@ span.close:focus {
   cursor: pointer;
 }
 
+/* Default is not to display mySlides */
 div.mySlides {
   display: none;
 }
 
+/* Place next and previous arrows over photo to enable scrolling */
 .prev,
 .next {
   cursor: pointer;
@@ -175,16 +177,19 @@ div.mySlides {
   -webkit-user-select: none;
 }
 
+/* Position next arrow on right side of photo */
 .next {
   right: 0;
   border-radius: 3px 0 0 3px;
 }
 
+/* Add background to arrows when hovered over */
 .prev:hover,
 .next:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
+/* Place number of current photo in top left, i.e. 1/5 */
 .numbertext {
   color: #f2f2f2;
   font-size: 12px;
@@ -193,20 +198,14 @@ div.mySlides {
   top: 0;
 }
 
+/* Position caption below photo */
 .caption-container {
   text-align: center;
   padding: 2px 16px;
   color: white;
 }
 
-img.hover-shadow {
-  transition: 0.3s;
-}
-
-.hover-shadow:hover {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-
+/* Center the search bar on the Search page */
 form.search {
   text-align: center;
   margin-top: 50px;

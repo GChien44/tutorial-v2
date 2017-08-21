@@ -16,8 +16,7 @@
 
     <h1>Photos</h1>
 
-    <!--The thumbnail class currently doesn't actually mean anything.
-    Use a for loop where indices of thumbnail references and their corresponding
+    <!--Use a for loop where indices of thumbnail references and their corresponding
     thumbnails match up so that info from references can be assigned to the appropriate
     thumbnail image-->
     <div class="gallery">
@@ -27,6 +26,8 @@
         <div class="descent">{{thumbnail_reference.thumbnail_name}}</div>
       </div>
       {% endfor %}
+
+      <!--Add the ability to click on thumbnails from above for loop and scroll through the original uploaded photos-->
       <div id='myModal' class="modal">
         <span class="close" onclick="closeModal()">&times;</span>
         <div class="modal-content">
@@ -48,12 +49,8 @@
       <script>
         var modal = document.getElementById('myModal');
         var img = document.getElementById('{{thumbnail_reference.thumbnail_name}}');
-        var modalImg = document.getElementById('{{loop.index}}');
-        var captionText = document.getElementById("caption");
-        var numText = document.getElementById("num");
         img.onclick = function(){
           modal.style.display = "block";
-          //numText.innerHTML = "{{loop.index}} / {{loop.length}}";
           currentSlide({{loop.index}});
         }
       </script>
@@ -68,16 +65,19 @@
         var slideIndex = 2;
         showSlides(slideIndex);
 
+        //Go forward or backward through photos
         function plusSlides(n) {
           slideIndex += n;
           showSlides(slideIndex);
         }
 
+        //Called when a thumbnail is clicked on
         function currentSlide(n) {
           slideIndex = n;
           showSlides(slideIndex);
         }
 
+        //Show the correct slide with image and caption
         function showSlides(n) {
           var i;
           var slides = document.getElementsByClassName('mySlides');

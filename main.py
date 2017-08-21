@@ -25,7 +25,7 @@ jinja_environment = jinja2.Environment(loader = jinja2.FileSystemLoader(template
 # be applicable to your project.
 THUMBNAIL_BUCKET = 'thumbnails-bucket'
 PHOTO_BUCKET = 'shared-photo-album'
-NUM_NOTIFICATIONS_TO_DISPLAY = 10
+NUM_NOTIFICATIONS_TO_DISPLAY = 50
 MAX_LABELS = 5
 
 # Describes a Notification to be displayed on the home/news feed page.
@@ -150,8 +150,6 @@ class ReceiveMessage(webapp2.RequestHandler):
       original_photo = get_original(photo_name, generation_number)
       uri = 'gs://' + PHOTO_BUCKET + '/' + photo_name
       labels = get_labels(uri, photo_name)
-      labels.append(photo_name)
-      labels.append(photo_name[:index])
       thumbnail_reference = ThumbnailReference(thumbnail_name=photo_name, thumbnail_key=thumbnail_key, labels=labels, original_photo=original_photo)
       thumbnail_reference.put()
 
@@ -162,8 +160,6 @@ class ReceiveMessage(webapp2.RequestHandler):
     elif event_type == 'OBJECT_DELETE' or event_type == 'OBJECT_ARCHIVE':
       remove_thumbnail_from_labels(thumbnail_key)
       delete_thumbnail(thumbnail_key)
-
-    # No action performed if event_type is OBJECT_UPDATE
 
 # Create notification.
 def create_notification(photo_name, event_type, generation, overwrote_generation=None, overwritten_by_generation=None):
@@ -232,7 +228,6 @@ def get_labels(uri, photo_name):
   index = photo_name.index(".jpg")
   photo_name_label = photo_name[:index]
   labels.append(photo_name_label)
-
 
   service_request = service.images().annotate(body={
       'requests': [{
