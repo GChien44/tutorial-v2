@@ -90,16 +90,14 @@ div.modal {
   height: 100%;
   overflow: auto;
   background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.75);
+  background-color: rgba(0,0,0,0.8);
 }
 
 div.modal-content {
   position: relative;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.75);
   margin: auto;
   padding: 0;
-  width: 90%;
+  width: 55%;
   max-width: 1200px;
 }
 
@@ -109,10 +107,10 @@ div.mySlides img {
   width: 100%;
   max-width: 700px;
   height: auto;
-  -webkit-animation-name: zoom;
+  /*-webkit-animation-name: zoom;
   -webkit-animation-duration: 0.6s;
   animation-name: zoom;
-  animation-duration: 0.6s;
+  animation-duration: 0.6s;*/
 }
 
 #caption {
@@ -158,10 +156,6 @@ span.close:focus {
 
 div.mySlides {
   display: none;
-  /*width: 70%;
-  margin: auto;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.75);*/
 }
 
 .prev,
@@ -170,7 +164,7 @@ div.mySlides {
   position: absolute;
   top: 50%;
   width: auto;
-  padding: 16px;
+  padding: 15px;
   margin-top: -50px;
   color: white;
   font-weight: bold;
@@ -192,7 +186,7 @@ div.mySlides {
 }
 
 .numbertext {
-  color: white;
+  color: #f2f2f2;
   font-size: 12px;
   padding: 8px 12px;
   position: absolute;
@@ -201,8 +195,6 @@ div.mySlides {
 
 .caption-container {
   text-align: center;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.75);
   padding: 2px 16px;
   color: white;
 }

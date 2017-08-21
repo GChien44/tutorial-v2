@@ -23,8 +23,8 @@ jinja_environment = jinja2.Environment(loader = jinja2.FileSystemLoader(template
 
 # Constants. Note: Change THUMBNAIL_BUCKET and PHOTO_BUCKET to
 # be applicable to your project.
-THUMBNAIL_BUCKET = 'photo-thumbnails-bucket'
-PHOTO_BUCKET = 'photo-album-bucket'
+THUMBNAIL_BUCKET = 'thumbnails-bucket'
+PHOTO_BUCKET = 'shared-photo-album'
 NUM_NOTIFICATIONS_TO_DISPLAY = 10
 MAX_LABELS = 5
 
