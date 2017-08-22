@@ -86,7 +86,7 @@ class PhotosHandler(webapp2.RequestHandler):
 class SearchHandler(webapp2.RequestHandler):
   def get(self):
     # Get search_term entered by user.
-    search_term = self.request.get('search-term')
+    search_term = self.request.get('search-term').lower()
     # Obtain label applicable to search term.
     label = Label.query(Label.label_name==search_term).get()
     # Build dictionary of img_url of thumbnails to thumbnail_references that
