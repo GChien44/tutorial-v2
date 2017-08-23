@@ -23,8 +23,8 @@ jinja_environment = jinja2.Environment(loader = jinja2.FileSystemLoader(template
 
 # Constants. Note: Change THUMBNAIL_BUCKET and PHOTO_BUCKET to
 # be applicable to your project.
-THUMBNAIL_BUCKET = 'thumbnails-bucket'
-PHOTO_BUCKET = 'shared-photo-album'
+THUMBNAIL_BUCKET = 'photo-thumbnails-bucket'
+PHOTO_BUCKET = 'photo-album-bucket'
 NUM_NOTIFICATIONS_TO_DISPLAY = 50
 MAX_LABELS = 5
 
@@ -145,8 +145,8 @@ class ReceiveMessage(webapp2.RequestHandler):
     # in GCS, create a thumbnail reference and store it in datastore, and add
     # the thumbnail_key to the appropriate Labels.
     if event_type == 'OBJECT_FINALIZE':
-      thumbnail = create_thumbnail(self, photo_name)
-      store_thumbnail_in_gcs(self, thumbnail_key, thumbnail)
+      thumbnail = create_thumbnail(photo_name)
+      store_thumbnail_in_gcs(thumbnail_key, thumbnail)
       original_photo = get_original(photo_name, generation_number)
       uri = 'gs://' + PHOTO_BUCKET + '/' + photo_name
       labels = get_labels(uri, photo_name)
@@ -195,14 +195,14 @@ def get_original(photo_name, generation):
   return 'https://storage.googleapis.com/' + PHOTO_BUCKET + '/' + photo_name + '?generation=' + generation
 
 # Shrinks specified photo to thumbnail size and returns resulting thumbnail.
-def create_thumbnail(self, photo_name):
+def create_thumbnail(photo_name):
   filename = '/gs/' + PHOTO_BUCKET + '/' + photo_name
   image = images.Image(filename=filename)
   image.resize(width=180, height=200)
   return image.execute_transforms(output_encoding=images.JPEG)
 
 # Stores thumbnail in GCS bucket under name thumbnail_key.
-def store_thumbnail_in_gcs(self, thumbnail_key, thumbnail):
+def store_thumbnail_in_gcs(thumbnail_key, thumbnail):
   write_retry_params = gcs.RetryParams(backoff_factor=1.1)
   filename = '/' + THUMBNAIL_BUCKET + '/' + thumbnail_key
   with gcs.open(filename, 'w') as filehandle:
