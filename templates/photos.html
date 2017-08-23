@@ -22,7 +22,7 @@
     <div class="gallery">
       {% for img_url, thumbnail_reference in thumbnails.iteritems() %}
       <div class="thumbnail">
-        <img id='{{thumbnail_reference.thumbnail_name}}' src='{{img_url}}' class="hover-shadow">
+        <img id='{{thumbnail_reference.thumbnail_name}}' src='{{img_url}}'>
         <div class="descent">{{thumbnail_reference.thumbnail_name}}</div>
       </div>
       {% endfor %}
@@ -62,8 +62,7 @@
           document.getElementById('myModal').style.display = "none";
         }
 
-        var slideIndex = 2;
-        showSlides(slideIndex);
+        var slideIndex;
 
         //Go forward or backward through photos
         function plusSlides(n) {

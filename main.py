@@ -23,8 +23,8 @@ jinja_environment = jinja2.Environment(loader = jinja2.FileSystemLoader(template
 
 # Constants. Note: Change THUMBNAIL_BUCKET and PHOTO_BUCKET to
 # be applicable to your project.
-THUMBNAIL_BUCKET = 'photo-thumbnails-bucket'
-PHOTO_BUCKET = 'photo-album-bucket'
+THUMBNAIL_BUCKET = 'thumbnails-bucket'
+PHOTO_BUCKET = 'shared-photo-album'
 NUM_NOTIFICATIONS_TO_DISPLAY = 50
 MAX_LABELS = 5
 
@@ -87,17 +87,15 @@ class SearchHandler(webapp2.RequestHandler):
   def get(self):
     # Get search_term entered by user.
     search_term = self.request.get('search-term').lower()
-    # Obtain label applicable to search term.
-    label = Label.query(Label.label_name==search_term).get()
+    references = ThumbnailReference.query().order(-ThumbnailReference.date).fetch();
     # Build dictionary of img_url of thumbnails to thumbnail_references that
     # have the given label.
     thumbnails = collections.OrderedDict()
-    if label is not None:
-      thumbnail_keys = label.labeled_thumbnails
-      for thumbnail_key in thumbnail_keys:
-        img_url = get_thumbnail(thumbnail_key)
-        thumbnails[img_url] = ThumbnailReference.query(ThumbnailReference.thumbnail_key==thumbnail_key).get()
-    thumbnails = collections.OrderedDict(reversed(list(thumbnails.items())))
+    for reference in references:
+      labels = reference.labels
+      if search_term in labels:
+        img_url = get_thumbnail(reference.thumbnail_key)
+        thumbnails[img_url] = reference;
     template_values = {'thumbnails':thumbnails}
     template = jinja_environment.get_template("search.html")
     # Write to appropriate html file.
@@ -153,12 +151,9 @@ class ReceiveMessage(webapp2.RequestHandler):
       thumbnail_reference = ThumbnailReference(thumbnail_name=photo_name, thumbnail_key=thumbnail_key, labels=labels, original_photo=original_photo)
       thumbnail_reference.put()
 
-      add_thumbnail_reference_to_labels(labels, thumbnail_key)
-
     # For delete/archive events: remove the thumbnail_key from all applicable
     # Labels, delete the thumbnail from GCS, and delete the thumbnail_reference.
     elif event_type == 'OBJECT_DELETE' or event_type == 'OBJECT_ARCHIVE':
-      remove_thumbnail_from_labels(thumbnail_key)
       delete_thumbnail(thumbnail_key)
 
 # Create notification.
@@ -261,34 +256,6 @@ def get_labels(uri, photo_name):
             labels.append(descript)
 
   return labels
-
-# Add given thumbnail_key to all applicable Labels or create new Labels if
-# necessary.
-def add_thumbnail_reference_to_labels(labels, thumbnail_key):
-  for label in labels:
-    label_to_append_to = Label.query(Label.label_name==label).get()
-    if label_to_append_to is None:
-      thumbnail_list_for_new_label = []
-      thumbnail_list_for_new_label.append(thumbnail_key)
-      new_label = Label(label_name=label, labeled_thumbnails=thumbnail_list_for_new_label)
-      new_label.put()
-    else:
-      label_to_append_to.labeled_thumbnails.append(thumbnail_key)
-      label_to_append_to.put()
-
-# Remove the given thumbnail_key from all applicable Labels.
-def remove_thumbnail_from_labels(thumbnail_key):
-  thumbnail_reference = ThumbnailReference.query(ThumbnailReference.thumbnail_key==thumbnail_key).get()
-  labels_to_delete_from = thumbnail_reference.labels
-  for label_name in labels_to_delete_from:
-    label = Label.query(Label.label_name==label_name).get()
-    labeled_thumbnails = label.labeled_thumbnails
-    labeled_thumbnails.remove(thumbnail_key)
-    # If there are no more thumbnails with a given label, delete the label.
-    if not labeled_thumbnails:
-      label.key.delete()
-    else:
-      label.put()
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
