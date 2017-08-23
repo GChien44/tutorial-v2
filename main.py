@@ -50,13 +50,6 @@ class ThumbnailReference(ndb.Model):
   labels = ndb.StringProperty(repeated=True)
   original_photo = ndb.StringProperty()
 
-# Describes a Label, as assigned by Cloud Vision to photos.
-# label_name: description of the label.
-# labeled_thumbnails: thumbnail_keys of photos labeled with the label_name.
-class Label(ndb.Model):
-  label_name = ndb.StringProperty()
-  labeled_thumbnails = ndb.StringProperty(repeated=True)
-
 # Home/news feed page (notification listing).
 class MainHandler(webapp2.RequestHandler):
   def get(self):
