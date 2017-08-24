@@ -46,22 +46,29 @@ jinja_environment = jinja2.Environment(
 
 
 class Notification(ndb.Model):
-    '''Describes a Notification to be displayed on the home/news
-    feed page. String message, date of posting, and generation number
-    to prevent the display of repeated notifications.'''
+    """Describes a Notification to be displayed on the home/news
+    feed page.
+
+    message: Notification text
+    date: date/time of posting
+    generation number: generation number of the modified object.
+    Used to prevent the display of repeated notifications."""
+
     message = ndb.StringProperty()
     date = ndb.DateTimeProperty(auto_now_add=True)
     generation = ndb.StringProperty()
 
 
 class ThumbnailReference(ndb.Model):
-    '''Describes a ThumbnailReference, which holds information about a given
+    """Describes a ThumbnailReference, which holds information about a given
     thumbnail (not the thumbnail itself).
+
     thumbnail_name: same as photo name.
     thumbnail_key: used to distinguish similarly named photos. Includes
-    name and generation number.
+    photo name and generation number.
     labels: list of label_names that apply to the photo.
-    original_photo: url of the original photo, stored in GCS.'''
+    original_photo: url of the original photo, stored in GCS."""
+
     thumbnail_name = ndb.StringProperty()
     thumbnail_key = ndb.StringProperty()
     date = ndb.DateTimeProperty(auto_now_add=True)
@@ -70,19 +77,18 @@ class ThumbnailReference(ndb.Model):
 
 
 class MainHandler(webapp2.RequestHandler):
-    '''Home/news feed page (notification listing).'''
+    """Home/news feed page (notification listing)."""
     def get(self):
         # Fetch all notifications in reverse date order.
         notifications = Notification.query().order(
             -Notification.date).fetch(NUM_NOTIFICATIONS_TO_DISPLAY)
         template_values = {'notifications': notifications}
-        template = jinja_environment.get_template("notifications.html")
-        # Write to the appropriate html file.
+        template = jinja_environment.get_template('notifications.html')
         self.response.write(template.render(template_values))
 
 
 class PhotosHandler(webapp2.RequestHandler):
-    '''All photos page: displays thumbnails of all uploaded photos.'''
+    """All photos page: displays thumbnails of all uploaded photos."""
     def get(self):
         # Get thumbnail references from datastore in reverse date order.
         thumbnail_references = ThumbnailReference.query().order(
@@ -90,17 +96,16 @@ class PhotosHandler(webapp2.RequestHandler):
         # Build dictionary of img_url of thumbnail to thumbnail_references.
         thumbnails = collections.OrderedDict()
         for thumbnail_reference in thumbnail_references:
-            img_url = get_thumbnail(thumbnail_reference.thumbnail_key)
+            img_url = get_thumbnail_serving_url(thumbnail_reference.thumbnail_key)
             thumbnails[img_url] = thumbnail_reference
         template_values = {'thumbnails': thumbnails}
-        template = jinja_environment.get_template("photos.html")
-        # Write to appropriate html file.
+        template = jinja_environment.get_template('photos.html')
         self.response.write(template.render(template_values))
 
 
 class SearchHandler(webapp2.RequestHandler):
-    '''Search page: displays search bar and all
-    thumbnails applicable to entered search term.'''
+    """Search page: displays search bar and all
+    thumbnails applicable to entered search term."""
     def get(self):
         # Get search_term entered by user.
         search_term = self.request.get('search-term').lower()
@@ -112,20 +117,19 @@ class SearchHandler(webapp2.RequestHandler):
         for reference in references:
             labels = reference.labels
             if search_term in labels:
-                img_url = get_thumbnail(reference.thumbnail_key)
+                img_url = get_thumbnail_serving_url(reference.thumbnail_key)
                 thumbnails[img_url] = reference
         template_values = {'thumbnails': thumbnails}
-        template = jinja_environment.get_template("search.html")
-        # Write to appropriate html file.
+        template = jinja_environment.get_template('search.html')
         self.response.write(template.render(template_values))
 
 
 class ReceiveMessage(webapp2.RequestHandler):
-    '''For receiving Cloud Pub/Sub push messages and performing
-    related logic.'''
+    """For receiving Cloud Pub/Sub push messages and performing
+    related logic."""
     def post(self):
         logging.debug('Post body: {}'.format(self.request.body))
-        message = json.loads(urllib.unquote(self.request.body).rstrip('='))
+        message = json.loads(urllib.unquote(self.request.body))
         attributes = message['message']['attributes']
 
         # Acknowledge message.
@@ -141,9 +145,10 @@ class ReceiveMessage(webapp2.RequestHandler):
 
         # Create the thumbnail_key using the photo_name and generation_number.
         # Note: Only photos with extension .jpg can be uploaded effectively.
-        index = photo_name.index(".jpg")
-        thumbnail_key = (photo_name[:index] +
-                         generation_number + photo_name[index:])
+        index = photo_name.index('.jpg')
+        thumbnail_key = '{}{}{}'.format(photo_name[:index],
+                                        generation_number,
+                                        photo_name[index:])
 
         # Create the Notification using the received information.
         new_notification = create_notification(
@@ -163,7 +168,7 @@ class ReceiveMessage(webapp2.RequestHandler):
             return
 
         # Don't act for metadata update events.
-        if new_notification.message == '':
+        if new_notification.message is None:
             return
 
         # Store new_notification in datastore.
@@ -175,8 +180,11 @@ class ReceiveMessage(webapp2.RequestHandler):
         if event_type == 'OBJECT_FINALIZE':
             thumbnail = create_thumbnail(photo_name)
             store_thumbnail_in_gcs(thumbnail_key, thumbnail)
-            original_photo = get_original(photo_name, generation_number)
-            uri = 'gs://' + PHOTO_BUCKET + '/' + photo_name
+            original_photo = get_original_url(photo_name, generation_number)
+            uri = '{}{}{}{}'.format('gs://',
+                                    PHOTO_BUCKET,
+                                    '/',
+                                    photo_name)
             labels = get_labels(uri, photo_name)
             thumbnail_reference = ThumbnailReference(
                 thumbnail_name=photo_name,
@@ -191,12 +199,12 @@ class ReceiveMessage(webapp2.RequestHandler):
             delete_thumbnail(thumbnail_key)
 
 
+# Create a Notification to be stored in Datastore.
 def create_notification(photo_name,
                         event_type,
                         generation,
                         overwrote_generation=None,
                         overwritten_by_generation=None):
-    '''Create a Notification to be stored in Datastore.'''
     if event_type == 'OBJECT_FINALIZE':
         if overwrote_generation is not None:
             message = '{} {}'.format(
@@ -217,14 +225,14 @@ def create_notification(photo_name,
         else:
             message = '{} {}'.format(photo_name, 'was deleted.')
     else:
-        message = ''
+        message = None
 
     return Notification(message=message, generation=generation)
 
 
 # Returns serving url for a given thumbnail, specified
 # by the photo_name parameter.
-def get_thumbnail(photo_name):
+def get_thumbnail_serving_url(photo_name):
     filename = '{}{}{}{}'.format(
         '/gs/',
         THUMBNAIL_BUCKET,
@@ -235,7 +243,7 @@ def get_thumbnail(photo_name):
 
 
 # Returns the url of the original photo.
-def get_original(photo_name, generation):
+def get_original_url(photo_name, generation):
     original_photo = '{}{}{}{}{}{}'.format(
         'https://storage.googleapis.com/',
         PHOTO_BUCKET,
@@ -301,7 +309,7 @@ def get_labels(uri, photo_name):
     labels = []
 
     # Label photo with its name, sans extension.
-    index = photo_name.index(".jpg")
+    index = photo_name.index('.jpg')
     photo_name_label = photo_name[:index]
     labels.append(photo_name_label)
 
@@ -321,7 +329,7 @@ def get_labels(uri, photo_name):
     response = service_request.execute()
     labels_full = response['responses'][0].get('labelAnnotations')
 
-    ignore = ['of', 'like', 'the', 'and', 'a', 'an', 'with']
+    ignore = set(['of', 'like', 'the', 'and', 'a', 'an', 'with'])
 
     # Add labels to the labels list if they are not already in the list and are
     # not in the ignore list.
