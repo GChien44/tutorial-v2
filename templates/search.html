@@ -43,7 +43,7 @@
         <div class="modal-content">
         {% for img_url, thumbnail_reference in thumbnails.iteritems() %}
           <div class="mySlides">
-            <div class="numbertext" id="num">{{loop.index}} / {{loop.length}}</div>
+            <div class="numbertext" id="num">{{loop.index}} / {{thumbnails|length}}</div>
             <img id='{{loop.index}}' src='{{thumbnail_reference.original_photo}}' alt='{{thumbnail_reference.thumbnail_name}}'>
           </div>
         {% endfor %}

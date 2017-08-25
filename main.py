@@ -96,7 +96,8 @@ class PhotosHandler(webapp2.RequestHandler):
         # Build dictionary of img_url of thumbnail to thumbnail_references.
         thumbnails = collections.OrderedDict()
         for thumbnail_reference in thumbnail_references:
-            img_url = get_thumbnail_serving_url(thumbnail_reference.thumbnail_key)
+            img_url = get_thumbnail_serving_url(
+                thumbnail_reference.thumbnail_key)
             thumbnails[img_url] = thumbnail_reference
         template_values = {'thumbnails': thumbnails}
         template = jinja_environment.get_template('photos.html')
@@ -189,7 +190,7 @@ class ReceiveMessage(webapp2.RequestHandler):
             thumbnail_reference = ThumbnailReference(
                 thumbnail_name=photo_name,
                 thumbnail_key=thumbnail_key,
-                labels=labels,
+                labels=list(labels),
                 original_photo=original_photo)
             thumbnail_reference.put()
 
@@ -306,12 +307,12 @@ def delete_thumbnail(thumbnail_key):
 # Use Cloud Vision API to get labels for a photo.
 def get_labels(uri, photo_name):
     service = googleapiclient.discovery.build('vision', 'v1')
-    labels = []
+    labels = set()
 
     # Label photo with its name, sans extension.
     index = photo_name.index('.jpg')
     photo_name_label = photo_name[:index]
-    labels.append(photo_name_label)
+    labels.add(photo_name_label)
 
     service_request = service.images().annotate(body={
         'requests': [{
@@ -336,13 +337,13 @@ def get_labels(uri, photo_name):
     if labels_full is not None:
         for label in labels_full:
             if label['description'] not in labels:
-                labels.append(label['description'])
+                labels.add(label['description'])
                 # Split the label into individual words, also to be added to
                 # labels list if not already.
                 descriptors = label['description'].split()
                 for descript in descriptors:
                     if descript not in labels and descript not in ignore:
-                        labels.append(descript)
+                        labels.add(descript)
 
     return labels
 
