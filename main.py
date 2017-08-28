@@ -147,9 +147,8 @@ class ReceiveMessage(webapp2.RequestHandler):
         # Create the thumbnail_key using the photo_name and generation_number.
         # Note: Only photos with extension .jpg can be uploaded effectively.
         index = photo_name.index('.jpg')
-        thumbnail_key = '{}{}{}'.format(photo_name[:index],
-                                        generation_number,
-                                        photo_name[index:])
+        thumbnail_key = '{}{}{}'.format(
+            photo_name[:index], generation_number, photo_name[index:])
 
         # Create the Notification using the received information.
         new_notification = create_notification(
@@ -182,10 +181,7 @@ class ReceiveMessage(webapp2.RequestHandler):
             thumbnail = create_thumbnail(photo_name)
             store_thumbnail_in_gcs(thumbnail_key, thumbnail)
             original_photo = get_original_url(photo_name, generation_number)
-            uri = '{}{}{}{}'.format('gs://',
-                                    PHOTO_BUCKET,
-                                    '/',
-                                    photo_name)
+            uri = 'gs://{}/{}'.format(PHOTO_BUCKET, photo_name)
             labels = get_labels(uri, photo_name)
             thumbnail_reference = ThumbnailReference(
                 thumbnail_name=photo_name,
@@ -208,23 +204,22 @@ def create_notification(photo_name,
                         overwritten_by_generation=None):
     if event_type == 'OBJECT_FINALIZE':
         if overwrote_generation is not None:
-            message = '{} {}'.format(
-                photo_name,
-                'was uploaded and overwrote an older version of itself.')
+            message = '{} was uploaded and overwrote an older' \
+                ' version of itself.'.format(photo_name)
         else:
-            message = '{} {}'.format(photo_name, 'was uploaded.')
+            message = '{} was uploaded.'.format(photo_name)
     elif event_type == 'OBJECT_ARCHIVE':
         if overwritten_by_generation is not None:
-            message = '{} {}'.format(photo_name,
-                                     'was overwritten by a newer version.')
+            message = '{} was overwritten by a newer version.'.format(
+                photo_name)
         else:
-            message = '{} {}'.format(photo_name, 'was archived.')
+            message = '{} was archived.'.format(photo_name)
     elif event_type == 'OBJECT_DELETE':
         if overwritten_by_generation is not None:
-            message = '{} {}'.format(photo_name,
-                                     'was overwritten by a newer version.')
+            message = '{} was overwritten by a newer version.'.format(
+                photo_name)
         else:
-            message = '{} {}'.format(photo_name, 'was deleted.')
+            message = '{} was deleted.'.format(photo_name)
     else:
         message = None
 
@@ -234,34 +229,24 @@ def create_notification(photo_name,
 # Returns serving url for a given thumbnail, specified
 # by the photo_name parameter.
 def get_thumbnail_serving_url(photo_name):
-    filename = '{}{}{}{}'.format(
-        '/gs/',
-        THUMBNAIL_BUCKET,
-        '/',
-        photo_name)
+    filename = '/gs/{}/{}'.format(THUMBNAIL_BUCKET, photo_name)
     blob_key = blobstore.create_gs_key(filename)
     return images.get_serving_url(blob_key)
 
 
 # Returns the url of the original photo.
 def get_original_url(photo_name, generation):
-    original_photo = '{}{}{}{}{}{}'.format(
-        'https://storage.googleapis.com/',
-        PHOTO_BUCKET,
-        '/',
-        photo_name,
-        '?generation=',
-        generation)
+    original_photo = 'https://storage.googleapis.com/' \
+        '{}/{}?generation={}'.format(
+            PHOTO_BUCKET,
+            photo_name,
+            generation)
     return original_photo
 
 
 # Shrinks specified photo to thumbnail size and returns resulting thumbnail.
 def create_thumbnail(photo_name):
-    filename = '{}{}{}{}'.format(
-        '/gs/',
-        PHOTO_BUCKET,
-        '/',
-        photo_name)
+    filename = '/gs/{}/{}'.format(PHOTO_BUCKET, photo_name)
     image = images.Image(filename=filename)
     image.resize(width=180, height=200)
     return image.execute_transforms(output_encoding=images.JPEG)
@@ -272,35 +257,23 @@ def store_thumbnail_in_gcs(thumbnail_key, thumbnail):
     write_retry_params = cloudstorage.RetryParams(
         backoff_factor=1.1,
         max_retry_period=15)
-    filename = '{}{}{}{}'.format(
-        '/',
-        THUMBNAIL_BUCKET,
-        '/',
-        thumbnail_key)
-    with cloudstorage.open(filename, 'w',
-                           retry_params=write_retry_params) as filehandle:
+    filename = '/{}/{}'.format(THUMBNAIL_BUCKET, thumbnail_key)
+    with cloudstorage.open(
+              filename, 'w', retry_params=write_retry_params) as filehandle:
         filehandle.write(thumbnail)
 
 
 # Deletes thumbnail from GCS bucket and deletes thumbnail_reference from
 # datastore.
 def delete_thumbnail(thumbnail_key):
-    filename = '{}{}{}{}'.format(
-        '/gs/',
-        THUMBNAIL_BUCKET,
-        '/',
-        thumbnail_key)
+    filename = '/gs/{}/{}'.format(THUMBNAIL_BUCKET, thumbnail_key)
     blob_key = blobstore.create_gs_key(filename)
     images.delete_serving_url(blob_key)
     thumbnail_reference = ThumbnailReference.query(
         ThumbnailReference.thumbnail_key == thumbnail_key).get()
     thumbnail_reference.key.delete()
 
-    filename = '{}{}{}{}'.format(
-        '/',
-        THUMBNAIL_BUCKET,
-        '/',
-        thumbnail_key)
+    filename = '/{}/{}'.format(THUMBNAIL_BUCKET, thumbnail_key)
     cloudstorage.delete(filename)
 
 
