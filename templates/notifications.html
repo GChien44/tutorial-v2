@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Notifications/Home</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+  </head>
+
+  <body>
+
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/photos">Photos</a></li>
+      <li><a href="/search">Search</a></li>
+    </ul>
+
+    <h1>Notifications</h1>
+
+    <!--Loop through notifications and print message and date/time to home page.-->
+
+    {% for notification in notifications %}
+    <div style="margin-left:20%;font-size:20px;">
+      <p><small style="font-size:12px;">{{notification.date.strftime('%B %d %Y %I:%M')}} UTC: </small>{{notification.message}}</p>
+    </div>
+    {% endfor %}
+
+  </body>
+</html>
