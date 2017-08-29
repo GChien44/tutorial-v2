@@ -1,14 +1,14 @@
 body {
-  background-color: lavender;
+  background-color: white;
 }
 
 /* Links sidebar */
-ul {
+ul.links {
   list-style-type: none;
   margin: 0;
   padding: 0;
   width: 10%;
-  background-color: purple;
+  background-color: #009925;
   position: fixed;
 }
 
@@ -18,6 +18,7 @@ li a {
   color: white;
   padding: 8px 8px;
   text-align: center;
+  font: Roboto;
   border-bottom: 1px solid white;
 }
 
@@ -28,16 +29,17 @@ li:last-child {
 
 /* Change color of links when hovered over */
 li a:hover {
-  background-color: violet;
+  background-color: #EEB211;
   color: white;
 }
 
 /* Title of page */
 h1 {
-  color: violet;
+  color: #3369E8;
   text-align: center;
+  font: Roboto;
   font-size: 50px;
-  border-bottom: 3px solid purple;
+  border-bottom: 3px solid #3369E8;
   padding: 15px;
   width: 60%;
   margin: auto;
@@ -46,9 +48,27 @@ h1 {
 
 /* No search results styling on Search page */
 h2 {
-  color: violet;
+  color: #D50F25;
   text-align: center;
   font-size: 20px;
+  font: Roboto;
+}
+
+ul.notification {
+  margin: 10px;
+  margin-left: 20%;
+  list-style-type: circle;
+
+}
+
+ul.notification li {
+  color: #D50F25;
+}
+
+li p {
+  font-size: 20px;
+  font: Roboto;
+  color: black;
 }
 
 /* Keeps thumbnails from being too far to the left or right on page */
@@ -63,7 +83,6 @@ div.thumbnail {
   float: left;
   width: 180px;
   height: 240px;
-  border: 1px solid lavender;
 }
 
 /* Format thumbnails in a table */
@@ -89,6 +108,7 @@ div.thumbnail img {
 div.descent {
   padding: 10px;
   text-align: center;
+  font: Roboto;
 }
 
 /* Format pop-up that appears when a thumbnail is clicked */
@@ -130,6 +150,7 @@ div.mySlides img {
   width: 80%;
   max-width: 700px;
   text-align: center;
+  font: Roboto;
   padding: 10px 0;
   height: 50px;
 }
@@ -192,6 +213,7 @@ div.mySlides {
 .numbertext {
   color: #f2f2f2;
   font-size: 12px;
+  font: Roboto;
   padding: 8px 12px;
   position: absolute;
   top: 0;
@@ -207,6 +229,7 @@ div.mySlides {
 /* Center the search bar on the Search page */
 form.search {
   text-align: center;
+  font: Roboto;
   margin-top: 50px;
 }
 
