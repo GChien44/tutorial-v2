@@ -13,22 +13,22 @@ ul.links {
 }
 
 /* Links to other pages */
-li a {
+ul.links li a {
   display: block;
   color: white;
   padding: 8px 8px;
   text-align: center;
-  font: Roboto;
+  font-family: 'Roboto', sans-serif;
   border-bottom: 1px solid white;
 }
 
 /* No division between last link and bottom of sidebar */
-li:last-child {
+ul.links li:last-child {
   border-bottom: none;
 }
 
 /* Change color of links when hovered over */
-li a:hover {
+ul.links li a:hover {
   background-color: #EEB211;
   color: white;
 }
@@ -37,7 +37,8 @@ li a:hover {
 h1 {
   color: #3369E8;
   text-align: center;
-  font: Roboto;
+  text-shadow: 0px 1px 1px #3369E8;
+  font-family: 'Roboto', sans-serif;
   font-size: 50px;
   border-bottom: 3px solid #3369E8;
   padding: 15px;
@@ -51,23 +52,22 @@ h2 {
   color: #D50F25;
   text-align: center;
   font-size: 20px;
-  font: Roboto;
 }
 
 ul.notification {
   margin: 10px;
   margin-left: 20%;
   list-style-type: circle;
-
+  font-family: 'Roboto', sans-serif;
 }
 
 ul.notification li {
   color: #D50F25;
 }
 
-li p {
+ul.notification li p {
   font-size: 20px;
-  font: Roboto;
+  font-family: 'Roboto', serif;
   color: black;
 }
 
@@ -108,7 +108,7 @@ div.thumbnail img {
 div.descent {
   padding: 10px;
   text-align: center;
-  font: Roboto;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* Format pop-up that appears when a thumbnail is clicked */
@@ -150,7 +150,7 @@ div.mySlides img {
   width: 80%;
   max-width: 700px;
   text-align: center;
-  font: Roboto;
+  font-family: 'Roboto', sans-serif;
   padding: 10px 0;
   height: 50px;
 }
@@ -191,6 +191,7 @@ div.mySlides {
   color: white;
   font-weight: bold;
   font-size: 20px;
+  font-family: 'Roboto', sans-serif;
   transition: 0.6s ease;
   border-radius: 0 3px 3px 0;
   user-select: none;
@@ -213,7 +214,7 @@ div.mySlides {
 .numbertext {
   color: #f2f2f2;
   font-size: 12px;
-  font: Roboto;
+  font-family: 'Roboto', sans-serif;
   padding: 8px 12px;
   position: absolute;
   top: 0;
@@ -229,7 +230,7 @@ div.mySlides {
 /* Center the search bar on the Search page */
 form.search {
   text-align: center;
-  font: Roboto;
+  font-family: 'Roboto', sans-serif;
   margin-top: 50px;
 }
 

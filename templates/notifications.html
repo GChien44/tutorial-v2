@@ -4,6 +4,7 @@
   <head>
     <title>Notifications/Home</title>
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   </head>
 
   <body>
@@ -20,7 +21,7 @@
 
     {% for notification in notifications %}
     <ul class="notification">
-      <li><p><small style="font-size:12px;"> {{notification.date.strftime('%B %d %Y %I:%M')}} UTC: </small>{{notification.message}}</p></li>
+      <li><p><small style="font-size:12px;"> {{notification.date.strftime('%B %d %Y %I:%M')}} UTC:  </small>{{notification.message}}</p></li>
     </ul>
     {% endfor %}
 
