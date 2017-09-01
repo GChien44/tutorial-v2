@@ -34,8 +34,8 @@ import googleapiclient.discovery
 
 # Constants. Note: Change THUMBNAIL_BUCKET and PHOTO_BUCKET to
 # be applicable to your project.
-THUMBNAIL_BUCKET = 'thumbnails-bucket'
-PHOTO_BUCKET = 'shared-photo-album'
+THUMBNAIL_BUCKET = 'photo-thumbnails-bucket'
+PHOTO_BUCKET = 'photo-album-bucket'
 NUM_NOTIFICATIONS_TO_DISPLAY = 50
 MAX_LABELS = 5
 
@@ -146,7 +146,10 @@ class ReceiveMessage(webapp2.RequestHandler):
 
         # Create the thumbnail_key using the photo_name and generation_number.
         # Note: Only photos with extension .jpg can be uploaded effectively.
-        index = photo_name.index('.jpg')
+        try:
+          index = photo_name.index('.jpg')
+        except:
+          return
         thumbnail_key = '{}{}{}'.format(
             photo_name[:index], generation_number, photo_name[index:])
 
