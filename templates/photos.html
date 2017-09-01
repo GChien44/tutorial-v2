@@ -17,6 +17,20 @@
 
     <h1>Photos</h1>
 
+    <h3>Upload an image:</h3>
+    <p><strong>Choose an image to upload.</strong></p>
+    <form enctype="multipart/form-data" action="/photos" method="post">
+      <input type="file" name="img-upload">
+      <button>Upload</button>
+    </form>
+
+    <h3>Delete an image:</h3>
+    <p><strong>Enter the name of an image to delete.</strong></p>
+    <form action="/photos" method="post">
+      <input name="img-delete">
+      <button>Delete</button>
+    </form>
+
     <!--Use a for loop where indices of thumbnail references and their corresponding
     thumbnails match up so that info from references can be assigned to the appropriate
     thumbnail image-->

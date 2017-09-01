@@ -103,6 +103,23 @@ class PhotosHandler(webapp2.RequestHandler):
         template = jinja_environment.get_template('photos.html')
         self.response.write(template.render(template_values))
 
+    """Uploads or deletes photos from GCS photo bucket."""
+    def post(self):
+        to_upload = self.request.get('img-upload')
+        if to_upload:
+            store_in_gcs(
+                self.request.params['img-upload'].filename,
+                to_upload,
+                PHOTO_BUCKET)
+
+        to_delete = self.request.get('img-delete')
+        if to_delete:
+            exists_delete = ThumbnailReference.query(
+                ThumbnailReference.thumbnail_name == to_delete).get()
+            if exists_delete:
+                delete_photo_from_gcs(to_delete)
+        self.redirect('/photos')
+
 
 class SearchHandler(webapp2.RequestHandler):
     """Search page: displays search bar and all
@@ -182,7 +199,7 @@ class ReceiveMessage(webapp2.RequestHandler):
         # and store it in Datastore.
         if event_type == 'OBJECT_FINALIZE':
             thumbnail = create_thumbnail(photo_name)
-            store_thumbnail_in_gcs(thumbnail_key, thumbnail)
+            store_in_gcs(thumbnail_key, thumbnail, THUMBNAIL_BUCKET)
             original_photo = get_original_url(photo_name, generation_number)
             uri = 'gs://{}/{}'.format(PHOTO_BUCKET, photo_name)
             labels = get_labels(uri, photo_name)
@@ -256,14 +273,15 @@ def create_thumbnail(photo_name):
 
 
 # Stores thumbnail in GCS bucket under name thumbnail_key.
-def store_thumbnail_in_gcs(thumbnail_key, thumbnail):
+def store_in_gcs(image_name, image, bucket):
     write_retry_params = cloudstorage.RetryParams(
         backoff_factor=1.1,
         max_retry_period=15)
-    filename = '/{}/{}'.format(THUMBNAIL_BUCKET, thumbnail_key)
+    filename = '/{}/{}'.format(bucket, image_name)
     with cloudstorage.open(
-              filename, 'w', retry_params=write_retry_params) as filehandle:
-        filehandle.write(thumbnail)
+              filename, 'w', content_type='image/jpeg',
+              retry_params=write_retry_params) as filehandle:
+        filehandle.write(image)
 
 
 # Deletes thumbnail from GCS bucket and deletes thumbnail_reference from
@@ -277,6 +295,12 @@ def delete_thumbnail(thumbnail_key):
     thumbnail_reference.key.delete()
 
     filename = '/{}/{}'.format(THUMBNAIL_BUCKET, thumbnail_key)
+    cloudstorage.delete(filename)
+
+
+# Deletes photo from GCS bucket.
+def delete_photo_from_gcs(photo_name):
+    filename = '/{}/{}'.format(PHOTO_BUCKET, photo_name)
     cloudstorage.delete(filename)
 
 
