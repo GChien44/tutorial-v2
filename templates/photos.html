@@ -17,19 +17,25 @@
 
     <h1>Photos</h1>
 
+    <div class = "wrapper">
+    <div class="uploading">
     <h3>Upload an image:</h3>
-    <p><strong>Choose an image to upload.</strong></p>
-    <form enctype="multipart/form-data" action="/photos" method="post">
+    <p class="instructions"><strong>Choose an image to upload.</strong></p>
+    <form class="user-change" enctype="multipart/form-data" action="/photos" method="post">
       <input type="file" name="img-upload">
-      <button>Upload</button>
+      <button id="upload">Upload</button>
     </form>
+    </div>
 
+    <div class="deleting">
     <h3>Delete an image:</h3>
-    <p><strong>Enter the name of an image to delete.</strong></p>
-    <form action="/photos" method="post">
+    <p class="instructions"><strong>Enter the name of an image to delete.</strong></p>
+    <form class="user-change" action="/photos" method="post">
       <input name="img-delete">
-      <button>Delete</button>
+      <button id="delete">Delete</button>
     </form>
+    </div>
+    </div>
 
     <!--Use a for loop where indices of thumbnail references and their corresponding
     thumbnails match up so that info from references can be assigned to the appropriate
